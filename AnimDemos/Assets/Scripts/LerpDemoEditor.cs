@@ -8,13 +8,13 @@ public class LerpDemoEditor : Editor
 {
     public override void OnInspectorGUI()
     {
-        base.OnInspectorGUI(); // draws normal part of editor
+        base.OnInspectorGUI(); // draw normal part of editor
 
         LerpDemo lerper = (LerpDemo) target;
 
-        if (GUILayout.Button("PLAY")) {
-            lerper.PlayTween();
-        
+        if (GUILayout.Button("PLAY"))
+        {
+            lerper.PlayTweenAnim();
         }
     }
 }

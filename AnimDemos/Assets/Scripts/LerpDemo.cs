@@ -5,17 +5,25 @@ using UnityEngine;
 public class LerpDemo : MonoBehaviour
 {
 
-    public GameObject startObject;
-    public GameObject endObject;
+    public GameObject objectStart;
+    public GameObject objectEnd;
 
     [Range(-1, 2)] public float percent = 0;
 
-    public float animLength = 2;
-    private float animTime = 0;
+    public float animationLength = 2;
+    private float animationPlayheadTime = 0;
     private bool isAnimPlaying = false;
 
-    public AnimationCurve animationCurve;
-    
+    public AnimationCurve animationCurve; // allows use of the curve editor in Unity
+
+    public float getCurrentPercent
+    {
+        get
+        {
+            return animationPlayheadTime / animationLength;
+        }
+    }
+
 
     // Start is called before the first frame update
     void Start()
@@ -26,37 +34,45 @@ public class LerpDemo : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (isAnimPlaying)
+        {
+            // move playhead forward
+            animationPlayheadTime += Time.deltaTime;
 
-        if (isAnimPlaying) {
-            animTime += Time.deltaTime;
-
-            percent = animTime / animLength;
+            // calculate new value for percent
+            percent = getCurrentPercent;
+            // clamp in 0 to 1 range
             percent = Mathf.Clamp(percent, 0, 1);
 
-            percent = animationCurve.Evaluate(percent);
+            float p = animationCurve.Evaluate(percent);
+            print(percent);
 
-            //percent = percent * percent * (3 - 2 * percent);
+            // percent = percent * percent * (3 - 2 * percent); // speeds up then slows down
 
-            DoTheLerp();
-
-            if (percent >= 1) isAnimPlaying = false;
+            // move object to lerped position
+            DoTheLerp(p);
+            // stop playing
+            if (percent >= 1) isAnimPlaying = false; 
         }
-        
     }
 
-    private void DoTheLerp()
+    public void DoTheLerp(float p)
     {
-        transform.position = AnimMath.Lerp(startObject.transform.position, endObject.transform.position, percent);
+        transform.position = AnimMath.Lerp(
+            objectStart.transform.position,
+            objectEnd.transform.position,
+            p
+        );
     }
 
-    public void PlayTween() 
+    public void PlayTweenAnim()
     {
         isAnimPlaying = true;
-        animTime = 0;    
+        animationPlayheadTime = 0;
     }
 
     private void OnValidate()
     {
-        DoTheLerp();
+        DoTheLerp(percent);
     }
 }
